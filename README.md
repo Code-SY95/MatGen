@@ -1,3 +1,5 @@
+## This README is a clone of the backbone network before any changes were made. It will be modified later.
+
 <div align="center">    
  
 # MatFuse: Controllable Material Generation with Diffusion Models
