@@ -64,9 +64,9 @@ class MaterialLoss(nn.Module):
             rend_diff_in, rend_diff_rec = self.renderer.generateDiffuseRendering(
                 1, 9, inputs, reconstructions
             )
-            rend_spec_in, rend_spec_rec = self.renderer.generateDiffuseRendering(
+            rend_spec_in, rend_spec_rec = self.renderer.generateDiffuseRendering( 
                 1, 9, inputs, reconstructions
-            )
+            ) # Sy : 왜 generateSpecularRendering을 부르지 않았을까?
 
             # compute loss
             rec_loss_diff = l2_loss(

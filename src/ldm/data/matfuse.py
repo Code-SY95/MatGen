@@ -11,14 +11,14 @@ from torch.utils.data import Dataset
 
 
 class MatFuseDataset(Dataset):
-    def __init__(self, data_root, size=256, output_names=["diffuse"]):
+    def __init__(self, data_root, size=256, output_names=["diffuse"]): # Sy: Why just diffuse only?
         self.data_root = Path(data_root)
 
         self.output_names = output_names
 
         self.materials = [
             {"name": x.parent.stem, "folder": x.parent}
-            for x in self.data_root.glob("**/diffuse.png")
+            for x in self.data_root.glob("**/**/diffuse.png") # Sy
         ]
 
         self._length = len(self.materials)
@@ -32,13 +32,13 @@ class MatFuseDataset(Dataset):
 
     def make_placeholder_map(self, curr_map):
         image = None
-        if curr_map in ["render", "basecolor", "diffuse", "specular"]:
+        if curr_map in ["render", "basecolor", "diffuse", "specular"]: # Sy: 3 channels
             image = Image.new("RGB", (self.size, self.size), (0, 0, 0))
-        elif curr_map in ["normal"]:
+        elif curr_map in ["normal"]: # Sy: 3 channels?
             image = Image.new("RGB", (self.size, self.size), (127, 127, 255))
-        elif curr_map in ["height", "metallic"]:
+        elif curr_map in ["height", "metallic"]: # Sy: 1 channel
             image = Image.new("L", (self.size, self.size), (0))
-        elif curr_map in ["roughness", "opacity"]:
+        elif curr_map in ["roughness", "opacity"]: # Sy: 1 channel
             image = Image.new("L", (self.size, self.size), (255))
         else:
             raise NotImplementedError(
@@ -69,11 +69,12 @@ class MatFuseDataset(Dataset):
         example = {}
         maps = {}
 
+        # Sy: remove metadata
         # load metadata
-        metadata = json.load(open(folder / "metadata.json"))
+        # metadata = json.load(open(folder / "metadata.json"))
 
-        # load description
-        example["text"] = ", ".join(metadata["tags"])
+        # # load description
+        # example["text"] = ", ".join(metadata["tags"])
 
         # load render
         src = random.choice(list(folder.glob("renders/*.png")))
@@ -86,12 +87,13 @@ class MatFuseDataset(Dataset):
             image = self.process_image(src, curr_map)
             maps[curr_map] = image
 
-        # Parse color palette
-        palette = metadata.get("palette", None)
-        if palette is not None:
-            example["palette"] = self.hex2rgb(palette)
+        # Sy: remove color palette & sketch code
+        # # Parse color palette
+        # palette = metadata.get("palette", None)
+        # if palette is not None:
+        #     example["palette"] = self.hex2rgb(palette)
 
-        example["sketch"] = self.process_sketch(folder)
+        # example["sketch"] = self.process_sketch(folder)
 
         # prepare maps
         example["maps"] = maps
@@ -99,15 +101,15 @@ class MatFuseDataset(Dataset):
 
         return example
 
-    def process_sketch(self, folder):
-        if (folder / "sketch.png").exists():
-            sketch = Image.open(folder / "sketch.png").convert("L")
-            sketch = sketch.resize([self.size, self.size])
-            sketch = TF.to_tensor(sketch)
-            sketch = rearrange(sketch, "c h w -> h w c")
-            return sketch.clamp(0, 1).float()
-        else:
-            return None
+    # def process_sketch(self, folder):
+    #     if (folder / "sketch.png").exists():
+    #         sketch = Image.open(folder / "sketch.png").convert("L")
+    #         sketch = sketch.resize([self.size, self.size])
+    #         sketch = TF.to_tensor(sketch)
+    #         sketch = rearrange(sketch, "c h w -> h w c")
+    #         return sketch.clamp(0, 1).float()
+    #     else:
+    #         return None
 
     def hex2rgb(self, palette):
         rgb_palette = []
@@ -121,7 +123,9 @@ class MatFuseDataset(Dataset):
 
 if __name__ == "__main__":
     dset = MatFuseDataset(
-        data_root="sample_materials",
+        # Sy
+        # data_root="sample_materials",
+        data_root = "Croped/train",
         output_names=["diffuse", "normal", "specular", "roughness"],
     )
 

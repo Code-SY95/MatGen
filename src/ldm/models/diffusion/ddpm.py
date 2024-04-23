@@ -507,7 +507,8 @@ class DDPM(pl.LightningModule):
         x = self.get_input(batch, self.first_stage_key)
         loss, loss_dict = self(x)
         return loss, loss_dict
-
+    
+    # Sy: Training_step is required by pytorch trainer.
     def training_step(self, batch, batch_idx):
         keep_cond = self.ucg_prng.choice(
             ["none", "all", "mixed"], p=[self.p_drop, self.p_keep, self.p_mixed]
@@ -552,7 +553,7 @@ class DDPM(pl.LightningModule):
                 "lr_abs", lr, prog_bar=True, logger=True, on_step=True, on_epoch=False
             )
 
-        return loss
+        return loss # Sy: training_step compute the loss for the given batch from the dataloader
 
     @torch.no_grad()
     def validation_step(self, batch, batch_idx):
@@ -624,6 +625,7 @@ class DDPM(pl.LightningModule):
                 return {key: log[key] for key in return_keys}
         return log
 
+    # Sy: Call back function by pytorch trainer. The trainer will call opt.step()
     def configure_optimizers(self):
         lr = self.learning_rate
         params = list(self.model.parameters())

@@ -345,16 +345,17 @@ class VQModelMulti(VQModel):
         super().__init__(
             ddconfig, kwargs.pop("lossconfig"), n_embed, embed_dim, **kwargs
         )
-
+        # Sy: Train code use multi Encoder -> change to single Encdoer
         del self.encoder
-
+        
         self.encoder_0 = Encoder(**ddconfig)
         self.encoder_1 = Encoder(**ddconfig)
         self.encoder_2 = Encoder(**ddconfig)
         self.encoder_3 = Encoder(**ddconfig)
+        # self.encoder = Encoder(**ddconfig)
 
         self.decoder = Decoder(**ddconfig)
-
+        # Sy
         del self.quantize
 
         self.quantize_0 = VectorQuantizer(
@@ -385,13 +386,21 @@ class VQModelMulti(VQModel):
             remap=remap,
             sane_index_shape=sane_index_shape,
         )
-
+        # self.quantize = VectorQuantizer(
+        #     n_embed,
+        #     embed_dim,
+        #     beta=0.25,
+        #     remap=remap,
+        #     sane_index_shape=sane_index_shape,
+        # )
+        # Sy
         del self.quant_conv
         self.quant_conv_0 = torch.nn.Conv2d(ddconfig["z_channels"], embed_dim, 1)
         self.quant_conv_1 = torch.nn.Conv2d(ddconfig["z_channels"], embed_dim, 1)
         self.quant_conv_2 = torch.nn.Conv2d(ddconfig["z_channels"], embed_dim, 1)
         self.quant_conv_3 = torch.nn.Conv2d(ddconfig["z_channels"], embed_dim, 1)
-
+        # self.quant_conv = torch.nn.Conv2d(ddconfig["z_channels"], embed_dim, 1)    # Sy: Q. output size 1에서 늘려야 하는지 체크   
+        
         self.post_quant_conv = torch.nn.Conv2d(embed_dim * 4, ddconfig["z_channels"], 1)
 
         if ckpt_path is not None:

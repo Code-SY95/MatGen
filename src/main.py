@@ -24,15 +24,18 @@ from torch.utils.data import DataLoader, Dataset, Sampler
 from torchvision.utils import save_image
 
 import wandb
-from ldm.data.material_utils import *
+# from ldm.data.material_utils import * # Sy: this is extract color palette code. 
 from ldm.util import instantiate_from_config
+
+import os
+os.environ["CUDA_VISIBLE_DEVICES"] = "1,2"
 
 MULTINODE_HACKS = True
 
-
+# Sy
 conditions = [
-    ["sketch"],
-    ["palette"],
+    # ["sketch"],
+    # ["palette"],
     ["image_embed"],
     ["text"],
 ]
@@ -399,8 +402,9 @@ class ImageLogger(Callback):
         self.log_on_batch_idx = log_on_batch_idx
         self.log_images_kwargs = log_images_kwargs if log_images_kwargs else {}
         self.log_first_step = log_first_step
-
-        wandb.init(project="matfuse", entity="matereal-diffuser")
+        # Sy
+        # wandb.init(project="matfuse", entity="matereal-diffuser")
+        wandb.init(project="matGen", entity="dhdev95")
 
     @rank_zero_only
     def _testtube(self, pl_module, images, batch_idx, split):

@@ -40,7 +40,7 @@ data:
     train:
       target: ldm.data.matfuse.MatFuseDataset
       params:
-        data_root: sample_materials
+        data_root: Croped/train # Sy
         size: 256
         output_names:
           - diffuse
@@ -50,7 +50,7 @@ data:
     validation:
       target: ldm.data.matfuse.MatFuseDataset
       params:
-        data_root: sample_materials
+        data_root: Croped/train # Sy
         size: 256
         output_names:
           - diffuse
